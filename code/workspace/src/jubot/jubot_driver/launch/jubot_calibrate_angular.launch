@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    <param name="use_sim_time" value="false"/>
+
+    <!-- 启动jubot_driver驱动包 -->
+    <node name="jubot_driver" pkg="jubot_driver" type="jubot_driver" output="screen" respawn="true">
+        <rosparam file="$(find jubot_driver)/config/jubot_params.yaml" command="load"/>
+        <param name="publish_odom_transform" value="true"/>
+        <param name="odom_frame" value="/odom"/>
+    </node>
+
+    <!-- 启动角速度校准节点 -->
+    <node name="calibrate_angular" pkg="jubot_driver" type="calibrate_angular.py" output="screen"/>
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_imu" args="-0.020 0.053 0.124 0 0 0 base_footprint base_imu_link 100"/>
+</launch>

@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<launch>
+	<param name="use_sim_time" value="false"/>
+	<arg name="lidar_type" value="$(optenv LIDAR_TYPE LS)"/>
+	<arg name="robot_type" value="$(optenv ROBOT_TYPE 4WD)"/>
+
+	<param name="robot_description" if="$(eval arg('robot_type') == 'MEC')" textfile="$(find jubot_driver)/urdf/jubot_mecx1.urdf" />
+	<param name="robot_description" if="$(eval arg('robot_type') == '4WD')" textfile="$(find jubot_driver)/urdf/jubot_4wdx1.urdf" />
+
+
+	<!-- 启动jubot_driver驱动包 -->
+	<node name="jubot_driver" pkg="jubot_driver" type="jubot_driver" output="screen" respawn="true">
+		<rosparam file="$(find jubot_driver)/config/jubot_params.yaml" command="load"/>
+		<remap from="/odom" to="/odom_raw"/>
+		<param name="odom_frame" value="odom"/>
+		<param name="publish_odom_transform" value="false"/>
+	</node>
+
+	<node pkg="tf2_ros" type="static_transform_publisher" name="base_foot_print_to_base_link" args="0 -0.05 0.14 0 0 0 base_footprint base_link"/>
+
+	<!-- 启动EKF融合定位节点 -->
+	<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf" output="screen">
+		<param name="output_frame" value="odom"/>
+		<param name="base_footprint_frame" value="base_footprint"/>
+		<param name="freq" value="30.0"/>
+		<param name="sensor_timeout" value="0.5"/>
+		<param name="odom_used" value="true"/>
+		<param name="imu_used" value="true"/>
+		<param name="vo_used" value="false"/>
+		<remap from="odom" to="/odom_raw"/>
+		<remap from="/imu_data" to="/imu"/>
+		<remap from="/robot_pose_ekf/odom_combined" to="/odom_combined"/>
+	</node>
+	<!-- 格式转换 -->
+	<node pkg="jubot_driver" type="odom_ekf.py" name="odom_ekf_node" output="screen">
+		<remap from="input" to="/odom_combined"/>
+		<remap from="output" to="/odom"/>
+	</node>
+
+	<!-- 启动激光雷达驱动包  -->
+	<group if="$(eval arg('lidar_type') == 'XAS')">
+		<!-- <include file="$(find rplidar_ros)/launch/rplidar_filtered.launch" /> -->
+		<include file="$(find rplidar_ros)/launch/rplidar.launch" />
+		<!--<node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0.05 0 0.1 3.1415926 0 0 base_link laser 20"/> -->
+		<node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_laser" args="0.0 0 0 3.1415926 0 0 base_footprint laser"/>
+	</group>
+	
+	<group if="$(eval arg('lidar_type') == 'LS')">
+        	<include file="$(find ls01b_v2)/launch/ls01b_v2.launch"/>
+        	<node pkg="tf2_ros" type="static_transform_publisher" name="base_foot_print_to_laser" args="0.0 0 0 0 0 0 base_footprint laser"/>
+    </group>
+
+	<node pkg="laser_filters" type="scan_to_scan_filter_chain" output="log" name="laser_filter">
+		<rosparam command="load" file="$(find jubot_driver)/config/jubot_laserfilter.yaml"/>
+		<remap from="/scan" to="/scan_origin"/>
+		<remap from="/scan_filtered" to="/scan"/>
+	</node> 
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+	<node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_imu" args="-0.020 0.053 0.124 0 0 0 base_footprint base_imu_link"/>
+
+</launch>

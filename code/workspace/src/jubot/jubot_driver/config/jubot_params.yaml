@@ -1,0 +1,17 @@
+version: JUBOT-Mec&4WD  #四驱或麦轮
+port_name: /dev/ravalle #设备端口映射名称
+baud_rate: 115200       #通信波特率，固定115200
+
+odom_frame: odom               #里程计坐标系
+base_frame: base_footprint      #底盘坐标系
+imu_frame: base_imu_link        #IMU坐标系
+
+linear_correction_factor: 1.10  #线速度校准系数
+angular_correction_factor: 0.95  #角速度校准系数
+
+publish_odom_transform: True   #是否发布odom->base_footprint坐标变换
+Kp: 360                         #下位机电机控制PID，P参数
+Ki: 0                           #下位机电机控制PID, I参数
+Kd: 240                         #下位机电机控制PID，D参数
+
+control_rate: 50                #底盘控制频率  

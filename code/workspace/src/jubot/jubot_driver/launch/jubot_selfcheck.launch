@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- 启动USB摄像头驱动包 -->
+
+  <include file="$(find jubot_driver)/launch/jubot_driver.launch"/>
+  <include file="$(find jubot_driver)/launch/jubot_lidar.launch"/>
+  <include file="$(find jubot_driver)/launch/jubot_camera.launch"/>
+
+  <node name="self_check" pkg="jubot_driver" type="self_check.py" output="screen" required="true"/>
+
+</launch>

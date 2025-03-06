@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!-- 
+<launch>
+    <param name="use_sim_time" value="false"/>
+    <!-- 启动jubot_driver驱动包 -->
+    <node name="jubot_driver" pkg="jubot_driver" type="jubot_driver" output="screen" respawn="true">
+        <rosparam file="$(find jubot_driver)/config/jubot_params.yaml" command="load"/>
+        <param name="publish_odom_transform" value="true"/>
+        <param name="odom_frame" value="/odom"/>
+    </node>
+
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_imu" args="-0.020 0.053 0.124 0 0 0 base_footprint base_imu_link 20"/>
+</launch>
+
+<launch -->>
+
+  <!-- args that can be set from the command line or a default will be used -->
+  <arg name="port_name" default="/dev/ravalle"/>
+  <arg name="baud_rate" default="115200"/>
+  <arg name="odom_frame" default="odom"/>
+  <arg name="imu_frame" default="base_imu_link"/>
+  <arg name="linear_correction_factor" default="1.10"/>
+  <arg name="angular_correction_factor" default="0.95"/>
+  <arg name="publish_odom_transform" default="True"/>
+  <arg name="Kp" default="360"/>
+  <arg name="Ki" default="0"/>
+  <arg name="Kd" default="240"/>
+  <arg name="control_rate" default="50"/>
+  <!-- start a turtlesim_node in the turtlesim1 namespace -->
+  <node pkg="jubot_driver" exec="jubot_driver" name="jubot_driver"/>
+    <!-- <param name="background_r" value="$(var background_r)"/>
+    <param name="background_g" value="$(var background_g)"/>
+    <param name="background_b" value="$(var background_b)"/> -->
+</launch>

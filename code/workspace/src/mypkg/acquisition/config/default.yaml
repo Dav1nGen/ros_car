@@ -1,0 +1,9 @@
+/acquisition:
+  ros__parameters:
+    auto_exposure_: true
+    gain: 10
+    exposure: 500  
+    brightness: 100
+    contrast: 80
+    saturation: 128
+
